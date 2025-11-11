@@ -43,6 +43,9 @@ class LeaveTable
                     ]),
                 TextColumn::make('leave_type')
                     ->label('Leave Type')
+                    ->badge()
+                    ->color(fn ($state) => $state instanceof \App\Enums\LeaveType ? $state->color() : \App\Enums\LeaveType::from($state)->color())
+                    ->formatStateUsing(fn ($state) => $state instanceof \App\Enums\LeaveType ? $state->label() : \App\Enums\LeaveType::from($state)->label())
                     ->searchable(),
                 TextColumn::make('leave_duration')
                     ->label('Duration Type')
@@ -109,15 +112,7 @@ class LeaveTable
                         ->default(null),
                     SelectFilter::make('leave_type')
                         ->label('Leave Type')
-                        ->options([
-                            'Sick Leave' => 'Sick Leave',
-                            'Vacation' => 'Vacation',
-                            'Personal Leave' => 'Personal Leave',
-                            'Maternity Leave' => 'Maternity Leave',
-                            'Paternity Leave' => 'Paternity Leave',
-                            'Bereavement Leave' => 'Bereavement Leave',
-                            'Other' => 'Other',
-                        ])
+                        ->options(\App\Enums\LeaveType::options())
                         ->default(null),
 
                 ]

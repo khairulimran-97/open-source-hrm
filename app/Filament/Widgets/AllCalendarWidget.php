@@ -35,15 +35,8 @@ class AllCalendarWidget extends CalendarWidget
                 TextEntry::make('leave_type')
                     ->label('Leave Type')
                     ->badge()
-                    ->color(fn ($record) => match ($record->leave_type) {
-                        'Sick Leave' => 'danger',
-                        'Vacation' => 'primary',
-                        'Personal Leave' => 'warning',
-                        'Maternity Leave' => 'pink',
-                        'Paternity Leave' => 'info',
-                        'Bereavement Leave' => 'gray',
-                        default => 'success',
-                    }),
+                    ->color(fn ($record) => \App\Enums\LeaveType::from($record->leave_type)->color())
+                    ->formatStateUsing(fn ($record) => \App\Enums\LeaveType::from($record->leave_type)->label()),
                 Grid::make(2)
                     ->schema([
                         TextEntry::make('start_date')

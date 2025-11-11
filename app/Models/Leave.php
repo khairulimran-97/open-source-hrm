@@ -30,6 +30,7 @@ class Leave extends Model implements Eventable
         'start_date' => 'date',
         'end_date' => 'date',
         'daily_durations' => 'array',
+        'leave_type' => \App\Enums\LeaveType::class,
     ];
 
     protected $appends = [
@@ -74,11 +75,10 @@ class Leave extends Model implements Eventable
 
     public function toCalendarEvent(): CalendarEvent
     {
-        // Convert start_date to datetime for calendar
         $startDate = Carbon::parse($this->start_date)->startOfDay();
         $endDate = Carbon::parse($this->end_date)->endOfDay();
 
-        $title = $this->employee->full_name.' - '.$this->leave_type;
+        $title = $this->employee->full_name.' - '.$this->leave_type->label();
 
         if ($this->leave_duration && $this->leave_duration !== 'Full Day') {
             $title .= ' ('.$this->leave_duration.')';
@@ -89,25 +89,7 @@ class Leave extends Model implements Eventable
             ->start($startDate)
             ->end($endDate)
             ->allDay(true)
-            ->backgroundColor($this->getLeaveColor())
+            ->backgroundColor($this->leave_type->calendarColor())
             ->textColor('#ffffff');
-    }
-
-    protected function getLeaveColor(): string
-    {
-        // Only show approved leaves
-        if ($this->status !== 'Approved') {
-            return '#6b7280'; // gray for non-approved
-        }
-
-        return match ($this->leave_type) {
-            'Sick Leave' => '#ef4444', // red
-            'Vacation' => '#3b82f6', // blue
-            'Personal Leave' => '#8b5cf6', // purple
-            'Maternity Leave' => '#ec4899', // pink
-            'Paternity Leave' => '#06b6d4', // cyan
-            'Bereavement Leave' => '#1f2937', // dark gray
-            default => '#10b981', // green
-        };
     }
 }

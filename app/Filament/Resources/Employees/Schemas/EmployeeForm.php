@@ -1,11 +1,21 @@
 <?php
 
 namespace App\Filament\Resources\Employees\Schemas;
-use Filament\Forms\Components\{TextInput, DatePicker, Select, Toggle, TextArea};
+
+use App\Models\Department;
+use App\Models\Position;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextArea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use App\Models\{Position, Department};
-use Filament\Schemas\Components\{Section, Grid};
 use Illuminate\Database\Eloquent\Builder;
+
 class EmployeeForm
 {
     public static function configure(Schema $schema): Schema
@@ -17,15 +27,13 @@ class EmployeeForm
                     ->collapsible()
                     ->schema([
 
-
                         Grid::make(2)->schema([
                             TextInput::make('employee_number')
                                 ->required()
                                 ->maxLength(50)
                                 ->label('Employee Number')
                                 ->placeholder('Enter employee number')
-                                ->columnSpan(1)
-                            ,
+                                ->columnSpan(1),
                             TextInput::make('first_name')
                                 ->required(),
                             TextInput::make('last_name')
@@ -38,10 +46,10 @@ class EmployeeForm
                                     'Single' => 'Single',
                                     'Married' => 'Married',
                                     'Divorced' => 'Divorced',
-                                    'Widowed' => 'Widowed'
+                                    'Widowed' => 'Widowed',
                                 ]),
 
-                        ])
+                        ]),
                     ])
                     ->columnSpanFull(),
                 Section::make('Contact Information')
@@ -50,15 +58,12 @@ class EmployeeForm
                         Grid::make(2)
                             ->schema([
                                 TextInput::make('email')->email()->required()->label('Email Address (this will be the default password for the employee)')
-                                    ->unique(ignoreRecord: true)
-
-                                ,
+                                    ->unique(ignoreRecord: true),
                                 TextInput::make('phone')->tel()->required()->label('Phone Number')->unique(ignoreRecord: true),
                                 TextInput::make('national_id')->required()->unique(ignoreRecord: true)
-                                    ->integer()
-                                ,
+                                    ->integer(),
                                 TextInput::make('kra_pin'),
-                            ])
+                            ]),
                     ])
                     ->columnSpanFull(),
                 Section::make('Emergency Contact')
@@ -69,7 +74,7 @@ class EmployeeForm
                             ->schema([
                                 TextInput::make('emergency_contact_name'),
                                 TextInput::make('emergency_contact_phone'),
-                            ])
+                            ]),
                     ])
                     ->columnSpanFull(),
                 Section::make('Next of Kin')
@@ -90,7 +95,7 @@ class EmployeeForm
                                 TextInput::make('next_of_kin_email')
                                     ->label('Email')
                                     ->email(),
-                            ])
+                            ]),
                     ])
                     ->columnSpanFull(),
                 Section::make('Employment Details')
@@ -103,7 +108,7 @@ class EmployeeForm
                                     ->relationship(
                                         name: 'department',
                                         titleAttribute: 'name',
-                                        modifyQueryUsing: fn(Builder $query) => $query->select('id', 'name')->orderBy('name', 'asc')
+                                        modifyQueryUsing: fn (Builder $query) => $query->select('id', 'name')->orderBy('name', 'asc')
                                     )
                                     ->label('Department')
                                     ->searchable()
@@ -166,7 +171,87 @@ class EmployeeForm
                                 DatePicker::make('hire_date')->required(),
                                 DatePicker::make('termination_date'),
                                 Toggle::make('is_active')->default(true),
+                            ]),
+                    ])
+                    ->columnSpanFull(),
+                Section::make('Leave Policies')
+                    ->collapsible()
+                    ->description('Configure leave allowances for '.now()->year)
+                    ->schema([
+                        Repeater::make('leave_policies_data')
+                            ->label('Leave Policies for '.now()->year)
+                            ->hiddenOn('edit')
+                            ->schema([
+                                Toggle::make('is_enabled')
+                                    ->default(true)
+                                    ->label('Enabled')
+                                    ->inline(false)
+                                    ->columnSpan(1),
+                                TextInput::make('leave_type_label')
+                                    ->label('Leave Type')
+                                    ->disabled()
+                                    ->columnSpan(2),
+                                TextInput::make('leave_type')
+                                    ->hidden()
+                                    ->dehydrated(false),
+                                TextInput::make('allowed_days')
+                                    ->numeric()
+                                    ->minValue(0)
+                                    ->step(0.5)
+                                    ->default(0)
+                                    ->required()
+                                    ->label('Allowed Days')
+                                    ->suffix('days')
+                                    ->columnSpan(2),
                             ])
+                            ->columns(5)
+                            ->default([
+                                ['leave_type' => 'sickLeave', 'leave_type_label' => 'Sick Leave', 'allowed_days' => 0, 'is_enabled' => true],
+                                ['leave_type' => 'vacation', 'leave_type_label' => 'Vacation', 'allowed_days' => 0, 'is_enabled' => true],
+                                ['leave_type' => 'personalLeave', 'leave_type_label' => 'Personal Leave', 'allowed_days' => 0, 'is_enabled' => true],
+                                ['leave_type' => 'maternityLeave', 'leave_type_label' => 'Maternity Leave', 'allowed_days' => 0, 'is_enabled' => true],
+                                ['leave_type' => 'paternityLeave', 'leave_type_label' => 'Paternity Leave', 'allowed_days' => 0, 'is_enabled' => true],
+                                ['leave_type' => 'timeOff', 'leave_type_label' => 'Time Off', 'allowed_days' => 0, 'is_enabled' => true],
+                                ['leave_type' => 'other', 'leave_type_label' => 'Other', 'allowed_days' => 0, 'is_enabled' => true],
+                            ])
+                            ->addable(false)
+                            ->deletable(false)
+                            ->reorderable(false)
+                            ->columnSpan('full'),
+                        Repeater::make('leavePolicies')
+                            ->relationship('leavePolicies', modifyQueryUsing: fn ($query) => $query->where('year', now()->year)->orderBy('leave_type'))
+                            ->label('Leave Policies for '.now()->year)
+                            ->visibleOn('edit')
+                            ->schema([
+                                Toggle::make('is_enabled')
+                                    ->default(true)
+                                    ->label('Enabled')
+                                    ->inline(false)
+                                    ->columnSpan(1),
+                                Placeholder::make('leave_type_display')
+                                    ->label('Leave Type')
+                                    ->content(fn ($record) => $record && $record->leave_type ? $record->leave_type->label() : '')
+                                    ->columnSpan(2),
+                                TextInput::make('allowed_days')
+                                    ->numeric()
+                                    ->minValue(0)
+                                    ->step(0.5)
+                                    ->default(0)
+                                    ->required()
+                                    ->label('Allowed Days')
+                                    ->suffix('days')
+                                    ->columnSpan(2),
+                            ])
+                            ->columns(5)
+                            ->mutateRelationshipDataBeforeSaveUsing(function (array $data): array {
+                                $data['year'] = now()->year;
+
+                                return $data;
+                            })
+                            ->addable(false)
+                            ->deletable(false)
+                            ->reorderable(false)
+                            ->columnSpan('full'),
                     ])
                     ->columnSpanFull(),
             ]);

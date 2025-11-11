@@ -18,15 +18,7 @@ class LeaveForm
         return $schema
             ->components([
                 Select::make('leave_type')
-                    ->options([
-                        'Sick Leave' => 'Sick Leave',
-                        'Vacation' => 'Vacation',
-                        'Personal Leave' => 'Personal Leave',
-                        'Maternity Leave' => 'Maternity Leave',
-                        'Paternity Leave' => 'Paternity Leave',
-                        'Bereavement Leave' => 'Bereavement Leave',
-                        'Other' => 'Other',
-                    ])
+                    ->options(\App\Enums\LeaveType::options())
                     ->required()
                     ->label('Leave Type')
                     ->live(),

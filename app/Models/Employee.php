@@ -4,15 +4,14 @@ namespace App\Models;
 
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Filament\Models\Contracts\FilamentUser;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Hash;
+
 class Employee extends Authenticatable
 {
     use HasFactory, Notifiable, SoftDeletes;
+
     //
     protected $fillable = [
         'employee_number',
@@ -37,7 +36,7 @@ class Employee extends Authenticatable
         'next_of_kin_relationship',
         'next_of_kin_phone',
         'next_of_kin_email',
-        'password'
+        'password',
     ];
 
     protected $casts = [
@@ -48,6 +47,7 @@ class Employee extends Authenticatable
         'department_id' => 'integer',
         'email_verified_at' => 'datetime',
     ];
+
     protected $appends = [
         'full_name',
 
@@ -63,8 +63,6 @@ class Employee extends Authenticatable
         return "{$this->first_name} {$this->last_name}";
     }
 
-
-
     public static function booted()
     {
         static::creating(function ($employee) {
@@ -76,21 +74,29 @@ class Employee extends Authenticatable
     {
         return true;
     }
+
     public function getFullNameAttribute()
     {
         return "{$this->first_name} {$this->last_name}";
     }
+
     public function department()
     {
         return $this->belongsTo(Department::class, 'department_id');
     }
+
     public function position()
     {
         return $this->belongsTo(Position::class, 'position_id');
     }
+
     public function tasks()
     {
         return $this->morphMany(Task::class, 'assignee');
     }
 
+    public function leavePolicies()
+    {
+        return $this->hasMany(LeavePolicy::class, 'employee_id');
+    }
 }

@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\Employees\Pages;
 
 use App\Filament\Resources\Employees\EmployeeResource;
-use Filament\Actions\CreateAction;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\ListRecords;
 
 class ListEmployees extends ListRecords
@@ -13,8 +13,10 @@ class ListEmployees extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()
-                ->createAnother(false),
+            Action::make('create')
+                ->label('New Employee')
+                ->url(fn (): string => EmployeeResource::getUrl('create'))
+                ->icon('heroicon-o-plus'),
         ];
     }
 }
