@@ -1,10 +1,16 @@
 <?php
 
-namespace App\Filament\Resources\Department\Schemas;
-use Filament\Tables\Table;
-use Filament\Actions\{ActionGroup, EditAction, ViewAction, DeleteAction, BulkActionGroup, DeleteBulkAction};
+namespace App\Filament\Resources\Departments\Schemas;
+
+use App\Models\Department;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
-use App\Models\{Department};
+use Filament\Tables\Table;
 
 
 class DepartmentTable
