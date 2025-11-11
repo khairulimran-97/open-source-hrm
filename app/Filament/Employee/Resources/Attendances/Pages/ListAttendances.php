@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\Attendances\Pages;
+namespace App\Filament\Employee\Resources\Attendances\Pages;
 
-use App\Filament\Resources\Attendances\AttendanceResource;
-use Filament\Actions\CreateAction;
+use App\Filament\Employee\Resources\Attendances\AttendanceResource;
 use Filament\Resources\Pages\ListRecords;
 
 class ListAttendances extends ListRecords
@@ -13,8 +12,7 @@ class ListAttendances extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()
-                ->createAnother(false),
+            //
         ];
     }
 }

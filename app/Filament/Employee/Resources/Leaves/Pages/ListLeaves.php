@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\Leaves\Pages;
+namespace App\Filament\Employee\Resources\Leaves\Pages;
 
-use App\Filament\Resources\Leaves\LeaveResource;
-use Filament\Actions\CreateAction;
+use App\Filament\Employee\Resources\Leaves\LeaveResource;
 use Filament\Resources\Pages\ListRecords;
 
 class ListLeaves extends ListRecords
@@ -13,8 +12,7 @@ class ListLeaves extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()
-                ->createAnother(false),
+            //
         ];
     }
 }

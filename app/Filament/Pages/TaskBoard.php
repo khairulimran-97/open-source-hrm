@@ -2,30 +2,35 @@
 
 namespace App\Filament\Pages;
 
+use App\Models\Employee;
 use App\Models\Task;
-
+use App\Models\User;
+use Filament\Actions\CreateAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Schema;
 use Filament\Support\Enums\FontWeight;
 use Illuminate\Database\Eloquent\Builder;
 use Relaticle\Flowforge\Board;
 use Relaticle\Flowforge\BoardPage;
 use Relaticle\Flowforge\Column;
-use Filament\Schemas\Schema;
-use Filament\Infolists\Components\{TextEntry};
-use Filament\Forms\Components\{Textarea, Select, DatePicker};
-use App\Models\{User, Employee};
-
-
-use Filament\Actions\{EditAction, DeleteAction, CreateAction, ViewAction};
-use Filament\Forms\Components\TextInput;
 
 class TaskBoard extends BoardPage
 {
     protected static string|null|\BackedEnum $navigationIcon = 'heroicon-o-view-columns';
+
     protected static ?string $navigationLabel = 'Task Board';
+
     protected static ?string $title = 'Task Board';
 
-    protected static string|\UnitEnum|null $navigationGroup = "Work space";
+    protected static string|\UnitEnum|null $navigationGroup = 'Work space';
 
     public function board(Board $board): Board
     {
@@ -36,12 +41,11 @@ class TaskBoard extends BoardPage
             ->recordTitleAttribute('title')
             ->columnIdentifier('status')
             ->positionIdentifier('position')
-            ->cardSchema(fn(Schema $schema) => $schema->components([
+            ->cardSchema(fn (Schema $schema) => $schema->components([
                 TextEntry::make('email')
                     ->icon('heroicon-o-user')
                     ->hiddenLabel()
-                    ->tooltip('Assigned to')
-                ,
+                    ->tooltip('Assigned to'),
                 TextEntry::make('description')
                     ->hiddenLabel()
                     ->limit(50, end: ' ...')
@@ -51,7 +55,7 @@ class TaskBoard extends BoardPage
                     ->icon('heroicon-o-calendar')
                     ->hiddenLabel()
                     ->badge()
-                    ->tooltip('Due date')
+                    ->tooltip('Due date'),
             ]))
             ->cardActions([
                 ViewAction::make()
@@ -60,28 +64,24 @@ class TaskBoard extends BoardPage
                         TextEntry::make('title')
                             ->weight(FontWeight::Bold)
                             ->hiddenLabel()
-                            ->hint('Title')
-                        ,
+                            ->hint('Title'),
                         TextEntry::make('description')
                             ->hint('Description')
-                            ->hiddenLabel()
-                        ,
+                            ->hiddenLabel(),
                         Grid::make(2)
                             ->schema([
                                 TextEntry::make('email')
                                     ->hiddenLabel()
                                     ->hint('Assigned to')
                                     ->icon('heroicon-o-user')
-                                    ->copyable()
-                                ,
+                                    ->copyable(),
                                 TextEntry::make('due_date')
                                     ->hiddenLabel()
                                     ->hint('Due date')
-                                    ->icon('heroicon-o-calendar-days')
-                            ])
+                                    ->icon('heroicon-o-calendar-days'),
+                            ]),
 
-                    ])
-                ,
+                    ]),
                 EditAction::make()
                     ->model(Task::class)
                     ->form([
@@ -99,7 +99,7 @@ class TaskBoard extends BoardPage
 
                                             if ($assigneeType && $assigneeId) {
                                                 $prefix = $assigneeType === Employee::class ? 'Employee_' : 'User_';
-                                                $component->state($prefix . $assigneeId);
+                                                $component->state($prefix.$assigneeId);
                                             }
                                         }
                                     })
@@ -108,32 +108,28 @@ class TaskBoard extends BoardPage
                                         collect()
                                             ->merge(
                                                 Employee::all()->mapWithKeys(
-                                                    fn($employee) => [
-                                                        "Employee_" . $employee->id =>
-                                                            $employee->email
+                                                    fn ($employee) => [
+                                                        'Employee_'.$employee->id => $employee->email,
                                                     ],
                                                 ),
                                             )
                                             ->merge(
                                                 User::all()->mapWithKeys(
-                                                    fn($user) => [
-                                                        "User_" . $user->id =>
-                                                            $user->email
+                                                    fn ($user) => [
+                                                        'User_'.$user->id => $user->email,
                                                     ],
                                                 ),
                                             ),
-                                    )
-                                ,
+                                    ),
                                 Select::make('status')
                                     ->options([
                                         'todo' => 'Todo',
                                         'in_progress' => 'In progress',
-                                        'completed' => 'Completed'
-                                    ])
-                                ,
+                                        'completed' => 'Completed',
+                                    ]),
                                 DatePicker::make('due_date')
                                     ->label('Due Date'),
-                            ])
+                            ]),
                     ])
                     ->mutateFormDataUsing(function (array $data, array $arguments): array {
                         $assigneeId = $data['assignee_id'];
@@ -150,9 +146,9 @@ class TaskBoard extends BoardPage
 
                         $data['assignee_id'] = $parsedAssigneeId;
                         $data['assignee_type'] = $assigneeType;
+
                         return $data;
-                    })
-                ,
+                    }),
                 DeleteAction::make()->model(Task::class),
             ])->cardAction('view')
             ->columns([
@@ -165,6 +161,7 @@ class TaskBoard extends BoardPage
                     ->label(' ')
                     ->iconButton()->icon('heroicon-o-plus')
                     ->model(Task::class)
+                    ->createAnother(false)
                     ->form([
                         TextInput::make('title')->required(),
                         Textarea::make('description'),
@@ -177,25 +174,22 @@ class TaskBoard extends BoardPage
                                         collect()
                                             ->merge(
                                                 Employee::all()->mapWithKeys(
-                                                    fn($employee) => [
-                                                        "Employee_" . $employee->id =>
-                                                            $employee->email
+                                                    fn ($employee) => [
+                                                        'Employee_'.$employee->id => $employee->email,
                                                     ],
                                                 ),
                                             )
                                             ->merge(
                                                 User::all()->mapWithKeys(
-                                                    fn($user) => [
-                                                        "User_" . $user->id =>
-                                                            $user->email
+                                                    fn ($user) => [
+                                                        'User_'.$user->id => $user->email,
                                                     ],
                                                 ),
                                             ),
-                                    )
-                                ,
+                                    ),
                                 DatePicker::make('due_date')
                                     ->label('Due Date'),
-                            ])
+                            ]),
                     ])
                     ->mutateFormDataUsing(function (array $data, array $arguments) {
                         $status = $arguments['column'];
@@ -215,12 +209,11 @@ class TaskBoard extends BoardPage
                         $data['assignee_type'] = $assigneeType;
                         $data['status'] = $arguments['column'] ?? $data['status'] ?? null;
                         $data['position'] = $this->getBoardPositionInColumn($arguments['column']);
+
                         return $data;
-                    })
+                    }),
 
-            ])
-        ;
-
+            ]);
 
     }
 

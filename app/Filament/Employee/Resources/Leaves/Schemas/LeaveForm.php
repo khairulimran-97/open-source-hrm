@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Filament\Resources\Leaves\Schemas;
+namespace App\Filament\Employee\Resources\Leaves\Schemas;
 
-use App\Models\Employee;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextArea;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
@@ -18,20 +17,6 @@ class LeaveForm
     {
         return $schema
             ->components([
-                //
-
-                Select::make('employee_id')
-                    ->options(function () {
-                        return Employee::all()->pluck('full_name', 'id');
-                    })
-                    ->searchable(
-                        [
-                            'first_name',
-                            'last_name',
-                        ]
-                    )
-                    ->required()
-                    ->label('Employee'),
                 Select::make('leave_type')
                     ->options([
                         'Sick Leave' => 'Sick Leave',
@@ -43,9 +28,11 @@ class LeaveForm
                         'Other' => 'Other',
                     ])
                     ->required()
+                    ->label('Leave Type')
                     ->live(),
                 DatePicker::make('start_date')
                     ->required()
+                    ->minDate(now())
                     ->label('Start Date')
                     ->live()
                     ->afterStateUpdated(function ($state, $set, $get) {
@@ -53,6 +40,7 @@ class LeaveForm
                     }),
                 DatePicker::make('end_date')
                     ->required()
+                    ->minDate(fn ($get) => $get('start_date') ?? now())
                     ->label('End Date')
                     ->live()
                     ->afterStateUpdated(function ($state, $set, $get) {
@@ -85,23 +73,11 @@ class LeaveForm
                     ->deletable(false)
                     ->columnSpan('full')
                     ->hidden(fn ($get) => ! $get('start_date') || ! $get('end_date')),
-                Select::make('status')
-                    ->options([
-                        'Pending' => 'Pending',
-                        'Approved' => 'Approved',
-                        'Rejected' => 'Rejected',
-                    ])
-                    ->default('Pending')
-                    ->required(),
-                Textarea::make('rejection_reason')
-                    ->nullable()
-                    ->columnSpan('full')
-                    ->label('Rejection Reason'),
                 Textarea::make('notes')
                     ->nullable()
                     ->columnSpan('full')
-                    ->label('Notes'),
-
+                    ->rows(3)
+                    ->label('Reason / Notes'),
             ]);
     }
 

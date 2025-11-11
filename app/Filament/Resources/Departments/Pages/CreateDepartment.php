@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\Departments\Pages;
 
 use App\Filament\Resources\Departments\DepartmentResource;
-use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateDepartment extends CreateRecord
@@ -16,4 +15,11 @@ class CreateDepartment extends CreateRecord
         return $this->previousUrl ?? $this->getResource()::getUrl('index');
     }
 
+    protected function getFormActions(): array
+    {
+        return [
+            $this->getCreateFormAction(),
+            $this->getCancelFormAction(),
+        ];
+    }
 }

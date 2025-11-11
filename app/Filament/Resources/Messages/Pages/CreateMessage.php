@@ -3,15 +3,16 @@
 namespace App\Filament\Resources\Messages\Pages;
 
 use App\Filament\Resources\Messages\MessageResource;
-use Filament\Actions;
+use App\Models\Employee;
+use App\Models\Message;
+use App\Models\Topic;
+use App\Models\User;
 use Filament\Resources\Pages\CreateRecord;
-use App\Models\{Message, Topic, User, Employee};
-
 
 class CreateMessage extends CreateRecord
 {
-
     protected static string $resource = MessageResource::class;
+
     protected function handleRecordCreation(array $data): topic
     {
 
@@ -43,11 +44,21 @@ class CreateMessage extends CreateRecord
             $message = Message::create($data);
 
         }
+
         return $topic;
 
     }
+
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('view', ['record' => $this->record]);
+    }
+
+    protected function getFormActions(): array
+    {
+        return [
+            $this->getCreateFormAction(),
+            $this->getCancelFormAction(),
+        ];
     }
 }
