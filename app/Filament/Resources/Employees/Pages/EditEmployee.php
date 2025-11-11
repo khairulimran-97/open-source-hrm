@@ -67,8 +67,10 @@ class EditEmployee extends EditRecord implements HasForms
         $this->contactInfoData = [
             'email' => $this->record->email,
             'phone' => $this->record->phone,
-            'national_id' => $this->record->national_id,
-            'kra_pin' => $this->record->kra_pin,
+            'nric_number' => $this->record->nric_number,
+            'income_tax_number' => $this->record->income_tax_number,
+            'epf_number' => $this->record->epf_number,
+            'socso_number' => $this->record->socso_number,
         ];
 
         $this->emergencyContactData = [
@@ -193,11 +195,20 @@ class EditEmployee extends EditRecord implements HasForms
                                 ->required()
                                 ->label('Phone Number')
                                 ->unique(ignoreRecord: true, table: 'employees', column: 'phone'),
-                            TextInput::make('national_id')
-                                ->required()
-                                ->unique(ignoreRecord: true, table: 'employees', column: 'national_id')
-                                ->integer(),
-                            TextInput::make('kra_pin'),
+                            TextInput::make('nric_number')
+                                ->label('NRIC Number (MyKad)')
+                                ->placeholder('YYMMDD-PB-###G')
+                                ->maxLength(255),
+                            TextInput::make('income_tax_number')
+                                ->label('Income Tax Number')
+                                ->placeholder('SG 12345678')
+                                ->maxLength(255),
+                            TextInput::make('epf_number')
+                                ->label('EPF Number')
+                                ->maxLength(255),
+                            TextInput::make('socso_number')
+                                ->label('SOCSO Number')
+                                ->maxLength(255),
                         ]),
                     ]),
             ])

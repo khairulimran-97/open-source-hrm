@@ -71,11 +71,20 @@ class CreateEmployee extends CreateRecord
                                     ->required()
                                     ->label('Phone Number')
                                     ->unique(table: 'employees', column: 'phone'),
-                                TextInput::make('national_id')
-                                    ->required()
-                                    ->unique(table: 'employees', column: 'national_id')
-                                    ->integer(),
-                                TextInput::make('kra_pin'),
+                                TextInput::make('nric_number')
+                                    ->label('NRIC Number (MyKad)')
+                                    ->placeholder('YYMMDD-PB-###G')
+                                    ->maxLength(255),
+                                TextInput::make('income_tax_number')
+                                    ->label('Income Tax Number')
+                                    ->placeholder('SG 12345678')
+                                    ->maxLength(255),
+                                TextInput::make('epf_number')
+                                    ->label('EPF Number')
+                                    ->maxLength(255),
+                                TextInput::make('socso_number')
+                                    ->label('SOCSO Number')
+                                    ->maxLength(255),
                             ]),
                         ]),
                 ]),
